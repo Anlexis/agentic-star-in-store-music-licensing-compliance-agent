@@ -1,0 +1,22 @@
+# Runtime parameters — read by src/services/runtime_config.py and passed to the
+# graph as Graph(config=...). Separate from config/agent.yaml, which is the
+# static manifest and holds no runtime values.
+#
+# Every value here has a reader. max_retry drives the backbone's retry route;
+# timeout_s is the declared per-call budget carried on the graph config for the
+# hosting runtime; the catalog block is the caller-data contract's bounds, read
+# by src/services/input_guard.py. Values are bounds-checked on load, so an
+# out-of-range or non-finite entry degrades to the documented default rather
+# than silently removing a limit.
+
+max_retry: 3
+timeout_s: 30
+
+# Caller-data contract bounds. A request may carry its own licensing catalog
+# records on the context channel; these are the ceilings on how much of it the
+# agent will read, and on the two usage counters the fee arithmetic multiplies
+# by. They exist so one request cannot turn into an unbounded report.
+catalog:
+  max_records: 25
+  max_store_count: 10000
+  max_monthly_performances: 1000000
